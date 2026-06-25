@@ -1,280 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="ru">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeautherX Web Tools</title>
-  <meta name="description" content="Easily allow users to install DeautherX firmware on the web." />
-  <meta name="color-scheme" content="dark light" />
-
-  <!-- FontAwesome for icons -->
-  <script src="https://kit.fontawesome.com/e674bba739.js" crossorigin="anonymous"></script>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
-  <!-- Styles -->
+  <title>DeautherX — прошивка из браузера</title>
+  <meta name="description" content="Прошивка DeautherX на ESP8266 прямо из браузера через Web Serial." />
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f5f5f5;
-      color: #333;
-      line-height: 1.6;
-      transition: background-color 0.3s ease, color 0.3s ease;
+    :root{
+      --bg:#0f1115; --card:#171a21; --border:#262b35; --text:#e7eaf0;
+      --muted:#9aa3b2; --accent:#3ddc84; --danger:#d33;
     }
-
-    header {
-      background-color: #007BFF;
-      padding: 20px;
-      text-align: center;
-      color: #fff;
-      font-size: 1.8rem;
-      letter-spacing: 1px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transition: background-color 0.3s ease;
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      background:radial-gradient(1200px 600px at 50% -10%,#1a1f2b 0%,var(--bg) 60%);
+      color:var(--text); min-height:100vh; display:flex; flex-direction:column;
+      align-items:center; padding:32px 16px 64px;
     }
-
-    h1.logo {
-      font-size: 2.5rem;
-      font-weight: 600;
+    .wrap{width:100%; max-width:640px}
+    h1{font-size:28px; margin:8px 0 4px; text-align:center}
+    h1 span{color:var(--accent)}
+    .sub{color:var(--muted); text-align:center; margin:0 0 28px; font-size:14px}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:22px; margin-bottom:18px}
+    .card h2{font-size:15px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:0 0 14px}
+    .options{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .opt{position:relative; border:1px solid var(--border); border-radius:10px; padding:16px; cursor:pointer; transition:border-color .15s, background .15s}
+    .opt:hover{border-color:#3a4150}
+    .opt input{position:absolute; opacity:0}
+    .opt:has(input:checked){border-color:var(--accent); background:rgba(61,220,132,.06)}
+    .opt-body b{display:block; font-size:15px; margin-bottom:2px}
+    .opt-body small{color:var(--muted)}
+    /* значок "?" с фото устройства */
+    .help{position:absolute; top:10px; right:10px; width:20px; height:20px; border-radius:50%;
+      border:1px solid var(--border); color:var(--muted); font-size:12px; font-weight:700;
+      display:flex; align-items:center; justify-content:center; cursor:help; background:#0c0e12}
+    .help:hover{color:var(--accent); border-color:var(--accent)}
+    .help .pop{
+      position:absolute; bottom:130%; right:-8px; width:240px; padding:8px;
+      background:#0c0e12; border:1px solid var(--accent); border-radius:10px;
+      opacity:0; visibility:hidden; transform:translateY(6px); transition:.15s; z-index:10;
+      box-shadow:0 10px 30px rgba(0,0,0,.5)
     }
-
-    .content {
-      max-width: 900px;
-      margin: 50px auto;
-      padding: 40px;
-      background-color: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    h2,
-    h5 {
-      margin-top: 1.5rem;
-      color: #333;
-      font-weight: 600;
-    }
-
-    .device-form {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      margin-bottom: 20px;
-      background-color: #f0f4f8;
-      border-radius: 8px;
-      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
-      transition: background-color 0.3s ease;
-    }
-
-    .device-form input {
-      margin-left: 10px;
-    }
-
-    .device-form label {
-      font-weight: 600;
-      font-size: 1.2rem;
-      color: #333;
-    }
-
-    /* Custom Button */
-    .button-row esp-web-install-button {
-     
-      background-color: #007bff;
-      color: white;
-      font-size: 1.1rem;
-      font-weight: 600;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .button-row esp-web-install-button:hover {
-      background-color: #0056b3;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0, 123, 255, 0.5);
-    }
-
-    ul {
-      padding-left: 20px;
-    }
-
-    ul li {
-      padding: 10px 0;
-      font-size: 1rem;
-      color: #666;
-      transition: color 0.3s ease;
-    }
-
-    a {
-      color: #fffffff;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    a:hover {
-      color: #0056b3;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 50px;
-      padding: 20px;
-      background-color: #;
-      color: #fff;
-      font-size: 1.3rem;
-      transition: background-color 0.3s ease;
-    }
-
-    .fa {
-      margin-right: 8px;
-    }
-
-    /* Animations */
-    .fade-in {
-      animation: fadeIn 0.8s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      0% {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Dark Mode */
-    @media (prefers-color-scheme: dark) {
-      body {
-        background-color: #1e1e1e;
-        color: #f5f5f5;
-      }
-
-      header {
-        background-color: #0a84ff;
-      }
-
-      .content {
-        background-color: #333;
-      }
-
-      h2,
-      h5,
-      label,
-      li {
-        color: #f5f5f5;
-      }
-
-      footer {
-        background-color: #0a84ff;
-      }
-
-      .device-form {
-        background-color: #444;
-      }
-
-      .button-row esp-web-install-button {
-        background-color: #0a84ff;
-      }
-
-      .button-row esp-web-install-button:hover {
-        background-color: #0073e6;
-      }
-    }
-
-    /* Responsiveness */
-    @media (max-width: 768px) {
-      .content {
-        padding: 20px;
-      }
-
-      .device-form {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      h1.logo {
-        font-size: 2rem;
-      }
-    }
+    .help:hover .pop{opacity:1; visibility:visible; transform:translateY(0)}
+    .help .pop img{width:100%; border-radius:6px; display:block}
+    .help .pop span{display:block; text-align:center; color:var(--muted); font-size:11px; margin-top:6px; font-weight:400}
+    .flash-row{display:flex; justify-content:center; margin-top:22px}
+    .unsupported{display:none; background:rgba(211,51,51,.1); border:1px solid var(--danger);
+      color:#ffb3b3; border-radius:10px; padding:14px; font-size:14px; text-align:center; margin-top:16px}
+    ol{color:var(--muted); font-size:14px; line-height:1.7; padding-left:18px; margin:0}
+    ol b{color:var(--text)}
+    footer{color:var(--muted); font-size:12px; text-align:center; margin-top:18px}
+    a{color:var(--accent)}
   </style>
 </head>
-
 <body>
-  <header>
-    <h1 class="logo fade-in">DeautherX Web Tools</h1>
-  </header>
+  <div class="wrap">
+    <h1>Deauther<span>X</span></h1>
+    <p class="sub">Прошивка ESP8266 прямо из браузера через Web Serial. Нужен Chrome или Edge на компьютере.</p>
 
-  <div class="content fade-in">
-    <h2><i class="fa fa-cogs"></i> Choose Display Type</h2>
-    <div class="device-form">
-      <label for="display-type"><i class="fa fa-desktop"></i> Display Options:</label>
-      <div>
-        <input type="radio" name="type" value="13" id="display-13" />
-        <label for="display-13">1.3 inch OLED Display</label>
-        <br />
-        <input type="radio" name="type" value="096" id="display-096" />
-        <label for="display-096">0.96 inch OLED Display</label>
+    <div class="card">
+      <h2>1 · Тип дисплея</h2>
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="type" value="096" />
+          <span class="opt-body"><b>0.96″ OLED</b><small>SSD1306, I²C</small></span>
+          <span class="help">?
+            <span class="pop"><img src="img/device-096.svg" alt="Плата с 0.96″ дисплеем"><span>Так выглядит плата с 0.96″ экраном</span></span>
+          </span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="type" value="13" checked />
+          <span class="opt-body"><b>1.3″ OLED</b><small>SH1106, I²C</small></span>
+          <span class="help">?
+            <span class="pop"><img src="img/device-13.svg" alt="Плата с 1.3″ дисплеем"><span>Так выглядит плата с 1.3″ экраном</span></span>
+          </span>
+        </label>
+      </div>
+
+      <div class="flash-row">
+        <esp-web-install-button>
+          <button slot="activate" style="background:var(--accent); color:#07130c; border:0; font-weight:700;
+            font-size:15px; padding:12px 28px; border-radius:10px; cursor:pointer;">
+            ⚡ Подключить и прошить
+          </button>
+          <span slot="unsupported"></span>
+          <span slot="not-allowed"></span>
+        </esp-web-install-button>
+      </div>
+
+      <div class="unsupported" id="unsupported">
+        Браузер не поддерживает Web Serial. Открой страницу в <b>Chrome</b> или <b>Edge</b> на компьютере
+        (Safari и мобильные браузеры не подойдут).
       </div>
     </div>
-    <p>You can use DeautherX without display or button using Web Interface.</p>
 
-    <div id="descriptif"></div>
-
-    <div class="button-row" align="center">
-      <esp-web-install-button class="invisible fade-in"></esp-web-install-button>
+    <div class="card">
+      <h2>Как прошить</h2>
+      <ol>
+        <li>Выбери <b>тип дисплея</b> (по умолчанию 1.3″, можно сменить).</li>
+        <li>Подключи плату по USB и нажми <b>«Подключить и прошить»</b>.</li>
+        <li>В диалоге выбери <b>последовательный порт</b> платы (CP2102 / CH340).</li>
+        <li>Дождись окончания записи и перезагрузи плату.</li>
+      </ol>
     </div>
 
-    <h5>Note</h5>
-    <ul>
-      <li><i class="fa fa-info-circle"></i> DeautherX web tools exclusively support I2C type displays.</li>
-      <li><i class="fa fa-exclamation-circle"></i> It does not provide support for SPI displays or other types.</li>
-      <li><i class="fa fa-clipboard-list"></i> To flash other displays or utilize different board-compatible firmware, please use Arduino IDE.</li>
-    </ul>
-
-    <h5>How To Flash DeautherX Firmware to ESP8266-based Board</h5>
-    <ul>
-      <li><i class="fa fa-check-circle"></i> Select display type.</li>
-      <li><i class="fa fa-usb"></i> Connect your ESP8266 board via USB.</li>
-      <li><i class="fa fa-plug"></i> Click "Connect" and choose the serial port of your ESP.</li>
-      <li><i class="fa fa-arrow-circle-down"></i> On Device Dashboard, click "Install".</li>
-    </ul>
-
-    <h5>How To Open Web-Based Serial Monitor</h5>
-    <ul>
-      <li><i class="fa fa-check-circle"></i> Select display type (correct type not necessary).</li>
-      <li><i class="fa fa-usb"></i> Connect your ESP8266 board via USB.</li>
-      <li><i class="fa fa-plug"></i> Click "Connect" and choose the serial port of your ESP.</li>
-      <li><i class="fa fa-terminal"></i> On Device Dashboard, click "Logs and Console".</li>
-    </ul>
+    <footer>
+      На базе <a href="https://github.com/esphome/esp-web-tools" target="_blank" rel="noopener">esp-web-tools</a> (MIT).
+      Прошивайте только собственные устройства.
+    </footer>
   </div>
 
-  <footer class="fade-in">
-    <p>Visit the DeautherX Web Tools GitHub repository to learn more: <a href="https://github.com/BlackTechX011/DeautherX_Web_Tools/" target="_blank">DeautherX</a></p>
-  </footer>
-
-    <script type="module" src="https://unpkg.com/esp-web-tools@9.1.1/dist/web/install-button.js?module"></script>
-
-  
-    <script>   
-        document.querySelectorAll('input[name="type"]').forEach(radio =>
-          radio.addEventListener("change", () => {
-            const button = document.querySelector('esp-web-install-button');
-            button.manifest = `https://raw.githubusercontent.com/BlackTechX011/DeautherX_Web_Tools/main/${radio.value}.json`;
-            button.classList.remove('invisible');
-          }
-        ));
+  <script type="module" src="https://unpkg.com/esp-web-tools@9.1.1/dist/web/install-button.js?module"></script>
+  <script>
+    const button = document.querySelector('esp-web-install-button');
+    function setManifest(){
+      const v = document.querySelector('input[name="type"]:checked').value;
+      button.manifest = `${v}.json`;
+    }
+    document.querySelectorAll('input[name="type"]').forEach(r => r.addEventListener('change', setManifest));
+    setManifest();
+    if (!('serial' in navigator)) document.getElementById('unsupported').style.display = 'block';
   </script>
-  </body>
-
-  </html>
+</body>
+</html>
