@@ -1,26 +1,64 @@
-# DeautherX Web Tool
+<div align="center">
 
-Explore the powerful capabilities of the DeautherX Web Tool by visiting [DeautherX Web Tools](https://blacktechx011.github.io/DeautherX_Web_Tools/), where you can effortlessly flash the [DeautherX](https://github.com/BlackTechX011/DeauherX) firmware onto any ESP8266-based board.
+# ⚡ DeautherX Web Flasher
 
+**Прошей ESP8266 прямо из браузера — без драйверов, без Arduino IDE.**
+**Flash your ESP8266 right from the browser — no drivers, no Arduino IDE.**
 
-## [Video Tutorial  "of old Version"](https://www.youtube.com/watch?v=qQUHb2XycNw)
+[![Open Flasher](https://img.shields.io/badge/🚀_Открыть_флешер_/_Open_Flasher-3ddc84?style=for-the-badge)](https://denny4-user.github.io/DeautherX_Web_Tools/)
+&nbsp;
+![ESP8266](https://img.shields.io/badge/chip-ESP8266-blue?style=flat-square)
+![Web Serial](https://img.shields.io/badge/Web_Serial-Chrome_%7C_Edge-orange?style=flat-square)
+![Lang](https://img.shields.io/badge/UI-Русский-red?style=flat-square)
 
-## How To Flash DeautherX Firmware to ESP8266-based Board
+</div>
 
-1. Visit [DeautherX Web Tools](https://blacktechx011.github.io/DeautherX_Web_Tools/) to begin the flashing process.
-2. Select the appropriate display type.
-3. Connect your ESP8266 board via USB.
-4. Click "Connect" and choose the serial port associated with your ESP.
-5. On the Device Dashboard, click "Install."
+---
 
-## How To Open Web-Based Serial Monitor
+## 🇷🇺 Русский
 
-1. Visit [DeautherX Web Tools](https://blacktechx011.github.io/DeautherX_Web_Tools/) to access the web-based serial monitor.
-2. Select the display type (Note: Correct display type selection is not mandatory but ensures proper program execution).
-3. Connect your ESP8266 board via USB.
-4. Click "Connect" and choose the serial port of your ESP.
-5. On the Device Dashboard, click "Logs and Console."
+Веб-инструмент для заливки русифицированной прошивки **DeautherX** на любую плату на базе ESP8266 — прямо из браузера через Web Serial.
 
-### screenshot( new version )
-![home](https://github.com/BlackTechX011/DeautherX_Web_Tools/blob/main/home.png)
-![home2](https://github.com/BlackTechX011/DeautherX_Web_Tools/blob/main/home2.png)
+### Возможности
+- 🔌 Прошивка в один клик, без установки софта
+- 🖥️ Выбор дисплея **0.96″ / 1.3″** (с фото платы по наведению на «?»)
+- 🇷🇺 Полностью русский интерфейс устройства (шрифт Minecraft, кириллица)
+- 📟 Веб-консоль / serial-монитор
+
+### Как прошить
+1. Открой [флешер](https://denny4-user.github.io/DeautherX_Web_Tools/) в **Chrome** или **Edge** на компьютере.
+2. Выбери тип дисплея (по умолчанию 1.3″).
+3. Подключи плату по USB → **«Подключить и прошить»**.
+4. Выбери последовательный порт платы (CP2102 / CH340) и дождись конца записи.
+
+> ⚠️ Нужен десктопный Chrome/Edge — Safari и мобильные браузеры Web Serial не поддерживают.
+
+---
+
+## 🇬🇧 English
+
+A browser-based tool to flash the Russian-localized **DeautherX** firmware onto any ESP8266 board over Web Serial.
+
+### Features
+- 🔌 One-click flashing, nothing to install
+- 🖥️ Display picker **0.96″ / 1.3″** (board photo on hover over “?”)
+- 🇷🇺 Fully Russian device UI (Minecraft pixel font, Cyrillic)
+- 📟 Web-based serial console
+
+### How to flash
+1. Open the [flasher](https://denny4-user.github.io/DeautherX_Web_Tools/) in **Chrome** or **Edge** on desktop.
+2. Pick your display type (defaults to 1.3″).
+3. Connect the board via USB → **“Connect & Flash”**.
+4. Select the board’s serial port (CP2102 / CH340) and wait for it to finish.
+
+> ⚠️ Requires desktop Chrome/Edge — Safari and mobile browsers don’t support Web Serial.
+
+---
+
+<div align="center">
+
+Прошивка / Firmware → **[DeautherX-rus](https://github.com/denny4-user/DeautherX-rus)** · На базе / Built on [esp-web-tools](https://github.com/esphome/esp-web-tools) (MIT)
+
+*Прошивайте только собственные устройства. / Flash only your own devices.*
+
+</div>
