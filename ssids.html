@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeautherX · Генератор SSID</title>
+  <style>
+    :root{--bg:#0f1115;--card:#171a21;--border:#262b35;--text:#e7eaf0;--muted:#9aa3b2;--accent:#3ddc84;--danger:#d33;--warn:#fc0}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      background:radial-gradient(1200px 600px at 50% -10%,#1a1f2b 0%,var(--bg) 60%);color:var(--text);
+      min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px 64px}
+    .wrap{width:100%;max-width:680px}
+    h1{font-size:24px;margin:6px 0 2px;text-align:center}
+    h1 span{color:var(--accent)}
+    .sub{color:var(--muted);text-align:center;margin:0 0 22px;font-size:13px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+    label.f{display:block;font-size:13px;color:var(--muted);margin:0 0 6px}
+    input[type=text],input[type=number]{width:100%;background:#0c0e12;border:1px solid var(--border);border-radius:9px;
+      color:var(--text);padding:11px 12px;font-size:15px;font-family:inherit}
+    input:focus{outline:none;border-color:var(--accent)}
+    .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+    .row>div{flex:1;min-width:120px}
+    .checks{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+    .chk{display:flex;align-items:flex-start;gap:9px;font-size:14px;cursor:pointer}
+    .chk input{margin-top:2px}
+    .chk small{display:block;color:var(--muted);font-size:12px}
+    button{background:var(--accent);color:#07130c;border:0;font-weight:700;font-size:15px;
+      padding:12px 22px;border-radius:10px;cursor:pointer;width:100%;margin-top:18px}
+    button.sec{background:#222732;color:var(--text);border:1px solid var(--border)}
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:12px}
+    .stats div{background:#0c0e12;border:1px solid var(--border);border-radius:8px;padding:8px 10px}
+    .stats b{color:var(--accent)}
+    .stats .bad b{color:var(--danger)}
+    .stats .warn b{color:var(--warn)}
+    .preview{background:#0c0e12;border:1px solid var(--border);border-radius:8px;padding:10px;
+      font-family:ui-monospace,Menlo,monospace;font-size:13px;max-height:230px;overflow:auto;white-space:pre;line-height:1.5}
+    .msg{font-size:13px;margin-top:10px;padding:10px;border-radius:8px;display:none}
+    .msg.err{display:block;background:rgba(211,51,51,.12);border:1px solid var(--danger);color:#ffb3b3}
+    .msg.ok{display:block;background:rgba(61,220,132,.1);border:1px solid var(--accent);color:#bfeccf}
+    .note{font-size:12px;color:var(--muted);background:rgba(255,204,0,.07);border:1px solid #5a4a10;
+      border-radius:8px;padding:10px;margin-top:12px}
+    a{color:var(--accent)}
+    .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top"><a href="index.html">← Флешер</a><span class="sub" style="margin:0">DeautherX</span></div>
+    <h1>Генератор <span>SSID</span></h1>
+    <p class="sub">Создаёт список одинаковых на вид Wi-Fi сетей через омоглифы (рус↔англ + спец-шрифт) и сохраняет в <code>ssids.json</code>.</p>
+
+    <div class="card">
+      <label class="f" for="base">Базовое название сети</label>
+      <input type="text" id="base" value="Собченко М.В. best" autocomplete="off" />
+
+      <div class="row">
+        <div>
+          <label class="f" for="count">Сколько штук (≤60, лучше ≤50)</label>
+          <input type="number" id="count" value="50" min="1" max="60" />
+        </div>
+      </div>
+
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="wpa2" checked> <span>WPA2 (защищённые сети)</span></label>
+        <label class="chk"><input type="checkbox" id="special">
+          <span>Использовать спец-шрифт (ᴀ ʙ ᴄ ᴇ …)
+          <small>⚠️ стилизованные глифы: «прикольнее», но это small-caps — на телефонах выглядят иначе обычных букв и на части устройств могут не отрисоваться. Без галочки — только рус/англ (пиксель-в-пиксель идеальная маскировка).</small></span>
+        </label>
+      </div>
+
+      <button id="gen">⚙️ Сгенерировать</button>
+    </div>
+
+    <div class="card" id="result" style="display:none">
+      <div class="stats" id="stats"></div>
+      <div class="preview" id="preview"></div>
+      <div class="msg" id="msg"></div>
+      <button class="sec" id="download" style="margin-top:14px">⬇️ Скачать ssids.json</button>
+      <div class="note">Заливать через FS-менеджер устройства в корень как <b>/ssids.json</b>, затем перезагрузка. Нужна прошивка с буфером 8000 (текущая) — иначе большие списки не загрузятся.</div>
+    </div>
+  </div>
+
+<script>
+// ===== группы взаимозаменяемых символов =====
+const SPECIAL = {"а":"ᴀ","в":"ʙ","г":"ᴦ","е":"ᴇ","к":"ᴋ","л":"ᴧ","м":"ʍ","п":"ᴨ","р":"ᴩ","с":"ᴄ","т":"ᴛ","ф":"ɸ","ш":"ɯ","э":"϶"};
+const SPECIAL_SET = new Set(Object.values(SPECIAL));
+const UPPER = [["А","A"],["В","B"],["Е","E"],["К","K"],["М","M"],["Н","H"],["О","O"],["Р","P"],["С","C"],["Т","T"],["У","Y"],["Х","X"]];
+const LOWER = [["а","a"],["е","e"],["о","o"],["с","c"],["р","p"],["у","y"],["х","x"]];          // рус↔англ строчные
+const LOWER_CYR_ONLY = ["в","г","к","л","м","п","т","ф","ш","э"];                              // только спец (нет англ-двойника)
+
+const GROUPS = {};
+function addGroup(arr){ for(const c of arr) if(!(c in GROUPS)) GROUPS[c]=arr; }
+for(const p of UPPER) addGroup(p);
+for(const [cyr,lat] of LOWER){ const g=[cyr,lat]; if(SPECIAL[cyr]) g.push(SPECIAL[cyr]); addGroup(g); }
+for(const cyr of LOWER_CYR_ONLY){ const g=[cyr]; if(SPECIAL[cyr]) g.push(SPECIAL[cyr]); addGroup(g); }
+
+const enc = new TextEncoder();
+const blen = s => enc.encode(s).length;
+
+function optionsFor(ch, useSpecial){
+  let g = GROUPS[ch] || [ch];
+  if(!useSpecial) g = g.filter(c => !SPECIAL_SET.has(c));
+  return g.length ? g : [ch];
+}
+
+function* product(arrays, cap){
+  // ленивый декартов продукт с ограничением попыток
+  const idx = arrays.map(()=>0);
+  let made = 0;
+  while(true){
+    yield arrays.map((a,i)=>a[idx[i]]).join("");
+    if(++made >= cap) return;
+    let k = arrays.length-1;
+    while(k>=0){ if(++idx[k] < arrays[k].length) break; idx[k]=0; k--; }
+    if(k<0) return;
+  }
+}
+
+function generate(){
+  const base = document.getElementById("base").value;
+  let count = parseInt(document.getElementById("count").value)||50;
+  count = Math.max(1, Math.min(60, count));
+  const wpa2 = document.getElementById("wpa2").checked;
+  const useSpecial = document.getElementById("special").checked;
+
+  const opts = [...base].map(ch => optionsFor(ch, useSpecial));
+  const total = opts.reduce((a,o)=>a*o.length, 1);
+
+  // собираем уникальные валидные (≤32 байта) варианты
+  const seen = new Set();
+  const valid = [];
+  const cap = Math.min(total, 300000);
+  for(const s of product(opts, cap)){
+    if(seen.has(s)) continue;
+    seen.add(s);
+    if(blen(s) <= 32) valid.push(s);
+    if(valid.length >= 3000) break;
+  }
+  // если спец включён — сначала самые «спец» (виден стилизованный шрифт);
+  // иначе — короткие первыми (меньше файл), базовый вперёд
+  const specCount = s => [...s].filter(c=>SPECIAL_SET.has(c)).length;
+  valid.sort((a,b)=>{
+    if(useSpecial){ const d = specCount(b)-specCount(a); if(d) return d; }
+    return blen(a)-blen(b) || (a===base?-1:b===base?1:0);
+  });
+  const picked = valid.slice(0, count);
+
+  // формат ssids.json
+  const entries = picked.map(s => [s, wpa2, blen(s)]);
+  const json = JSON.stringify({random:false, ssids:entries});
+  const fileBytes = enc.encode(json).length;
+  const maxb = picked.reduce((m,s)=>Math.max(m,blen(s)),0);
+  const treeEst = (2 + 4*picked.length)*12;
+  const bufEst = fileBytes + treeEst;
+
+  // статистика
+  const overBuf = bufEst > 7600;
+  const few = picked.length < count;
+  document.getElementById("stats").innerHTML = `
+    <div>Уникальных доступно: <b>${Math.min(valid.length, total)}${total>valid.length?'+':''}</b></div>
+    <div class="${few?'warn':''}">Сгенерировано: <b>${picked.length}</b>${few?' (меньше запроса)':''}</div>
+    <div>Длина SSID: <b>${picked.length?Math.min(...picked.map(blen)):0}–${maxb}</b> / 32 б</div>
+    <div>Файл: <b>${fileBytes}</b> б</div>
+    <div class="${overBuf?'bad':''}" style="grid-column:1/3">Нагрузка на буфер парсера: <b>~${bufEst}</b> / 8000</div>`;
+
+  const msg = document.getElementById("msg");
+  msg.className = "msg";
+  if(picked.length === 0){ msg.className="msg err"; msg.textContent="Не удалось собрать ни одного варианта ≤32 байт. Укоротите название или выключите спец-шрифт."; }
+  else if(overBuf){ msg.className="msg err"; msg.textContent="⚠️ Список близок к пределу буфера — устройство может не загрузить его. Уменьшите кол-во или используйте более короткие/латинские варианты."; }
+  else if(few){ msg.className="msg ok"; msg.textContent=`В названии мало взаимозаменяемых букв — доступно только ${picked.length} уникальных. Добавьте букв с омоглифами (а е о с р у х, или включите спец-шрифт).`; }
+  else { msg.className="msg ok"; msg.textContent="✓ Готово. Всё помещается."; }
+
+  document.getElementById("preview").textContent =
+    picked.slice(0,20).map((s,i)=>String(i+1).padStart(2)+"  "+s+"   ("+blen(s)+"б)").join("\n") +
+    (picked.length>20 ? `\n… ещё ${picked.length-20}` : "");
+
+  document.getElementById("result").style.display = "block";
+  window.__json = json;
+}
+
+document.getElementById("gen").addEventListener("click", generate);
+document.getElementById("download").addEventListener("click", ()=>{
+  if(!window.__json) return;
+  const blob = new Blob([window.__json], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "ssids.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+generate();
+</script>
+</body>
+</html>
